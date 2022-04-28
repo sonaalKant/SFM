@@ -9,6 +9,7 @@ from Codes.EssentialMatrixFromFundamentalMatrix import getEssentialMatrix
 from Codes.ExtractCameraPose import getCameraPose
 from Codes.LinearTriangulation import do_triangulation
 from Codes.DisambiguateCameraPose import do_chirality
+from Codes.NonlinearTriangulation import nonlinear_triangulation
 
 def generate_data(data_path):
     matching_files = glob.glob(data_path + "/matching*.txt")
@@ -54,10 +55,10 @@ def main(data_path):
 
     data_dict = do_ransac(data_dict)
 
-    im_id1 = list(data_dict.keys())[0]
-    im_id2 = list(data_dict[im_id1].keys())[0]
+    images = list(data_dict.keys())
+    im_id1, im_id2 = images[:2]
 
-    F = getFundamentalMatrix(data_dict[im_id1][im_id2]["src"], data_dict[im_id1][im_id2]["dst"])
+    F = data_dict[im_id1][im_id2]["F"]
 
     E = getEssentialMatrix(F, K)
 
@@ -67,13 +68,18 @@ def main(data_path):
     X_set = [do_triangulation(K, np.zeros((3,1)), np.eye(3), C, R, data_dict[im_id1][im_id2]["src"], data_dict[im_id1][im_id2]["dst"])
                 for C,R in zip(C_list, R_list)]
     
-    C,R,X = do_chirality(C_list, R_list, X_set)
+    #plot_points(X_set)
+    
+    C,R,X,idxs = do_chirality(C_list, R_list, X_set)
 
-    plot_points([X])
+    #plot_points([X])
+
+    src = data_dict[im_id1][im_id2]["src"][idxs]
+    dst = data_dict[im_id1][im_id2]["dst"][idxs]
+    
+    X_new = nonlinear_triangulation(K, np.zeros((3,1)), np.eye(3), C, R, src, dst, X)
 
     import pdb;pdb.set_trace()
-    
-    X = nonlinear_triangulation(K, np.zeros((3,1)), np.eye(3), C, R, data_dict[im_id1][im_id2]["src"], data_dict[im_id1][im_id2]["dst"], X)
 
     C0 = np.zeros((3,1))
     R0 = np.eye(3)
