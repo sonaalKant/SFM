@@ -27,6 +27,7 @@ def do_triangulation(K, C1, R1, C2, R2, x1, x2):
     
     return X
 
+
     
 
 

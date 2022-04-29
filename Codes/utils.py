@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+from scipy.spatial.distance import cdist
 
 def to_homogeneous(points):
     ones = np.ones((points.shape[:-1]))
@@ -43,3 +44,31 @@ def solve_svd(A):
     U,S,V = np.linalg.svd(A)
     idx = np.argmin(S)
     return V[idx]
+
+def get_common_world_points(X, data_dict, registered_images, registered_image_points, im_id2):
+
+    best_im_id = None
+    best_x_pts = list()
+    best_X_pts = list()
+
+    for im_id, pts in zip(registered_images, registered_image_points):
+        
+        src = data_dict[im_id][im_id2]["src"]
+        dst = data_dict[im_id][im_id2]["dst"]
+        
+        dist = cdist(src, pts)
+        id1, id2 = np.where(dist == 0)
+        
+        if len(id1) > 0:
+            best_x_pts += dst[id1].tolist()
+            best_X_pts += X[id2].tolist()
+    
+    
+    best_X_pts, idxs = np.unique(best_X_pts, axis=0, return_index=True)
+    best_x_pts = np.array(best_x_pts)[idxs]
+
+    assert len(best_X_pts) == len(best_x_pts)
+
+    print(f"Found --> {len(best_x_pts)}")
+
+    return best_X_pts, best_x_pts
