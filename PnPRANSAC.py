@@ -1,9 +1,11 @@
 from LinearPnP import *
 import numpy as np
+import random
 from LinearTriangulation import make_P
 from NonlinearTriangulation import *
+from utils import *
 
-
+np.random.seed(2)
 def reprojectionError(X, x, P0):
     X = to_homogeneous(X)
     
@@ -42,7 +44,7 @@ def PnPRansac(X,x,K):
     M = 2000
     pnp_best = None
     idxs_best = list()
-    eps = 5
+    eps = 100
 
     for i in range(M):
         idxs = random.sample( list(np.arange(len(x))), 6)

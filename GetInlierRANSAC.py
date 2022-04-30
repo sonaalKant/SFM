@@ -1,7 +1,7 @@
 import numpy as np
 from EstimateFundamentalMatrix import get_F
 from collections import OrderedDict
-
+np.random.seed(2)
 def get_res(F, p1, p2):
 	p1 = np.array([p1[0], p1[1], 1])
 	p2 = np.array([p2[0], p2[1], 1])

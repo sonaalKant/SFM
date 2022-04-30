@@ -68,8 +68,7 @@ def main(data_path):
     
     K = get_callibration(data_path)
 
-    # pts1 = np.array(data_dict['1']['2']['src'])
-    # pts2 = np.array(data_dict['1']['2']['dst'])
+
     # # print(pts1.shape)
     # img1 = cv2.imread(data_path+'/1.jpg')
     # img2 = cv2.imread(data_path+'/2.jpg')
@@ -79,6 +78,8 @@ def main(data_path):
     images = list(data_dict.keys())
     images = sorted(images)
     im_id1, im_id2 = images[:2]
+    pts1 = np.array(data_dict[im_id1][im_id2]['src'])
+    pts2 = np.array(data_dict[im_id1][im_id2]['dst'])
 
     F = data_dict[im_id1][im_id2]["F"]
     # print(pts1.shape)
@@ -94,9 +95,10 @@ def main(data_path):
     print('F:\n',F, '\nE:\n',E)
 
     R_list, C_list = getCameraPose(E)
+    C0 = np.zeros((3,1))
+    R0 = np.eye(3)
 
-
-    X_set = [do_triangulation(K, C, R, pts1, pts2)
+    X_set = [do_triangulation(K, C0, R0, C, R, pts1, pts2)
                 for C,R in zip(C_list, R_list)]
 
     for k in X_set:
@@ -107,18 +109,17 @@ def main(data_path):
     src = pts1[idxs]
     dst = pts2[idxs]
     X = X[idxs]
-    plt.scatter(X[:,0], X[:,2], s=0.4)
-    plt.show()
+    # plt.scatter(X[:,0], X[:,2], s=0.4)
+    # plt.show()
     # print(X)
     # import pdb;pdb.set_trace()
     # exit()
 
-    C0 = np.zeros((3,1))
-    R0 = np.eye(3)
-    X_new = nonlinear_triangulation(R0, C0, R, C, X, pts1, pts2)
-    plt.scatter(X_new[:,0], X_new[:,2], s=0.4)
-    plt.scatter(X_set[idx][:,0], X_set[idx][:,2], s=0.4)
-    plt.show()
+    
+    X_new = nonlinear_triangulation(R0, C0, R, C, X, src, dst)
+    # plt.scatter(X_new[:,0], X_new[:,2], s=0.4)
+    # plt.scatter(X_set[idx][:,0], X_set[idx][:,2], s=0.4)
+    # plt.show()
 
     C_list = [C0, C]
     R_list = [R0, R]
@@ -129,14 +130,17 @@ def main(data_path):
     
     # new_R, new_C = LinearPnP(X_new, pts1, K)
 
-    import pdb;pdb.set_trace()
+    # import pdb;pdb.set_trace()
 
     for i in range(2, len(images)):
         im_id2 = images[i]
 
         X_i, x = get_common_world_points(X, data_dict, registered_images, registered_image_points, im_id2)
         
-        C_i, R_i = PnPRansac(X_i, x, K)
+        try:
+            C_i, R_i = PnPRansac(X_i, x, K)
+        except:
+            import pdb;pdb.set_trace()
         C_i, R_i = NonLinearPnP(X_i, x, K, C_i, R_i)
 
 
@@ -147,13 +151,19 @@ def main(data_path):
 
             X_new = do_triangulation(K, C,R, C_i, R_i, data_dict[im_id1][im_id2]["src"], data_dict[im_id1][im_id2]["dst"])
             X_new = np.array(X_new)
-            X_new = nonlinear_triangulation(K, C,R, C_i, R_i, data_dict[im_id1][im_id2]["src"], data_dict[im_id1][im_id2]["dst"], X_new)
+            X_new = nonlinear_triangulation(R, C, R_i, C_i, X_new, data_dict[im_id1][im_id2]["src"], data_dict[im_id1][im_id2]["dst"])
 
-            X = X + X_new
+            X = np.vstack((X, X_new))
         
         registered_images.append(im_id2)
+        registered_image_points.append(x)
         C_list.append(C_i)
         R_list.append(R_i)
+
+    plt.scatter(X[:,0], X[:,2], s=0.4)
+    plt.show()
+
+    import pdb; pdb.set_trace()
 
 
     

@@ -33,9 +33,9 @@ def make_P(R, C):
 
 
 
-def LinearTriangulation(K, C2, R2, pt1, pt2):
-	C1 = np.zeros((3,1))
-	R1 = np.eye(3)
+def LinearTriangulation(K, C1, R1, C2, R2, pt1, pt2):
+	# C1 = np.zeros((3,1))
+	# R1 = np.eye(3)
 	P1 = make_P(R1, C1)
 	P2 = make_P(R2, C2)
 	X_set = []

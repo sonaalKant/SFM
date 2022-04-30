@@ -1,4 +1,5 @@
 import numpy as np
+from utils import *
 
 # def make_A(X, x, K):
 # 	X = np.hstack((X, np.ones((len(X), 1))))
@@ -53,6 +54,9 @@ def LinearPnP(K,x,X):
     R = U@V
     t = P[:,3]
     C = -np.linalg.inv(R)@t
+    if np.linalg.det(R)<0:
+    	R = -R
+    	C = -C
 
     return R,C
 	

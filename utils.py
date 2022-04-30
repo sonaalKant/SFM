@@ -54,6 +54,9 @@ def get_common_world_points(X, data_dict, registered_images, registered_image_po
 
     for im_id, pts in zip(registered_images, registered_image_points):
         
+        if im_id not in data_dict or im_id2 not in data_dict[im_id]:
+            continue
+            
         src = data_dict[im_id][im_id2]["src"]
         dst = data_dict[im_id][im_id2]["dst"]
         
