@@ -13,10 +13,6 @@ def reprojectionError(X, x, P0):
     
     return camera1
 
-# def error(X, P, p1):
-# 	X_ = np.hstack((X, np.ones((len(X), 1))))
-# 	error = (p1[0] - ((P[0][0,:]@X_.T)/(P[0][2,:]@X_.T)))**2 + (p1[1] - ((P[0][1,:]@X_.T)/(P[0][2,:]@X_.T)))**2
-# 	return error
 
 # def PnPRANSAC(X, x, K):
 # 	iterations = 2000

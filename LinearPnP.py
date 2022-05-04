@@ -53,7 +53,8 @@ def LinearPnP(K,x,X):
     U,S,V = np.linalg.svd(R)
     R = U@V
     t = P[:,3]
-    C = -np.linalg.inv(R)@t
+    # C = -np.linalg.inv(R)@t
+    C = np.linalg.inv(R)@t
     if np.linalg.det(R)<0:
     	R = -R
     	C = -C

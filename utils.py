@@ -3,6 +3,20 @@ import numpy as np
 import cv2
 from scipy.spatial.distance import cdist
 
+def update_traj(traj, traj_pts, X, x, im_id):
+    for i in traj.keys():
+        for k, j in enumerate(X):
+            if (np.array(i) == j).all():
+                traj[i].append(im_id)
+                traj_pts[i][im_id] = x[k]
+    return traj, traj_pts
+
+def add_to_traj(traj, traj_pts, X_new, x, x2, im_id, im_id2):
+    for j, i in enumerate(X_new):
+        traj[tuple(i)] = [im_id, im_id2]
+        traj_pts[tuple(i)] = {im_id2: x2[j], im_id:x[j]}
+    return traj, traj_pts
+
 def to_homogeneous(points):
     ones = np.ones((points.shape[:-1]))
     ones = np.expand_dims(ones, -1)
