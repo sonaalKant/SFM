@@ -17,3 +17,5 @@ Download the data from https://github.com/cmsc733/cmsc733.github.io/blob/master/
 python Wrapper.py
 
 Run the code, and Enjoy! :)
+
+The Unsupervised Deep Learning Version (SFMLearner) can be found https://github.com/sonaalKant/SFM_unsupervised
